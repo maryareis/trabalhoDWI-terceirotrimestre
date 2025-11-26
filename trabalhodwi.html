@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Controle de Tarefas</title>
+</head>
+
+<body>
+
+<h1>Sistema de Controle de Tarefas</h1>
+
+<!-- LISTA -->
+<div id="listaTela">
+    <h2>Lista de Tarefas</h2>
+
+    <button id="btnNovaTarefa">Nova Tarefa</button>
+
+    <table border="1" width="100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Prioridade</th>
+                <th>Descrição</th>
+                <th>Local</th>
+                <th>Recursos</th>
+                <th>Data Limite</th>
+                <th>Matrícula</th>
+            </tr>
+        </thead>
+        <tbody id="listaCorpo"></tbody>
+    </table>
+</div>
+
+<!-- CADASTRO -->
+<div id="cadastroTela" style="display:none;">
+
+    <h2>Cadastrar Nova Tarefa</h2>
+
+    <label>Prioridade</label>
+    <select id="prioridade">
+        <option value="">Selecione</option>
+        <option>Baixa</option>
+        <option>Normal</option>
+        <option>Urgente</option>
+    </select>
+
+    <label>Descrição</label>
+    <input id="descricao" type="text">
+
+    <label>Local</label>
+    <input id="local" type="text">
+
+    <label>Recursos Necessários (um por linha)</label>
+    <textarea id="recursos"></textarea>
+
+    <label>Data Limite</label>
+    <input id="dataLimite" type="datetime-local">
+
+    <label>Matrícula</label>
+    <input id="matricula" type="number">
+
+    <button id="btnSalvar">Salvar</button>
+    <button id="btnCancelar">Cancelar</button>
+</div>
+
+<script>
+// Abrir lista
+function abrirLista() {
+    document.getElementById("listaTela").style.display = "block";
+    document.getElementById("cadastroTela").style.display = "none";
+    carregar();
+}
+
+// Abrir cadastro
+function abrirCadastro() {
+    document.getElementById("listaTela").style.display = "none";
+    document.getElementById("cadastroTela").style.display = "block";
+    document.getElementById("prioridade").value = "";
+    document.getElementById("descricao").value = "";
+    document.getElementById("local").value = "";
+    document.getElementById("recursos").value = "";
+    document.getElementById("dataLimite").value = "";
+    document.getElementById("matricula").value = "";
+}
+
+// Carregar lista
+function carregar() {
+    let dados = JSON.parse(localStorage.getItem("tarefas")) || [];
+    let corpo = document.getElementById("listaCorpo");
+    corpo.innerHTML = "";
+
+    for (let i = 0; i < dados.length; i++) {
+        let t = dados[i];
+
+        // Urgente em vermelho
+        let cor = t.prioridade === "Urgente" ? " style='color:red; font-weight:bold;'" : "";
+
+        let linha = "<tr" + cor + ">";
+        linha += "<td>" + (i+1) + "</td>";
+        linha += "<td>" + t.prioridade + "</td>";
+        linha += "<td>" + t.descricao + "</td>";
+        linha += "<td>" + t.local + "</td>";
+        linha += "<td>" + t.recursosNecessarios.join(", ") + "</td>";
+        linha += "<td>" + t.dataLimite + "</td>";
+        linha += "<td>" + t.matricula + "</td>";
+        linha += "</tr>";
+
+        corpo.innerHTML += linha;
+    }
+}
+
+// Salvar tarefa
+function salvar() {
+    let prioridade = document.getElementById("prioridade").value;
+    let descricao = document.getElementById("descricao").value;
+    let local = document.getElementById("local").value;
+    let recursos = document.getElementById("recursos").value;
+    let dataLimite = document.getElementById("dataLimite").value;
+    let matricula = document.getElementById("matricula").value;
+
+    if (!prioridade || !descricao || !local || !dataLimite || !matricula) {
+        alert("Preencha todos os campos obrigatórios.");
+        return;
+    }
+
+    let listaRecursos = recursos.split("\n");
+
+    let novaTarefa = {
+        prioridade: prioridade,
+        descricao: descricao,
+        local: local,
+        recursosNecessarios: listaRecursos,
+        dataLimite: dataLimite,
+        matricula: matricula
+    };
+
+    let lista = JSON.parse(localStorage.getItem("tarefas")) || [];
+    lista.push(novaTarefa);
+    localStorage.setItem("tarefas", JSON.stringify(lista));
+
+    abrirLista(); // volta e atualiza automaticamente
+}
+
+// Eventos
+document.getElementById("btnNovaTarefa").onclick = abrirCadastro;
+document.getElementById("btnCancelar").onclick = abrirLista;
+document.getElementById("btnSalvar").onclick = salvar;
+
+// Inicializa
+abrirLista();
+</script>
+
+</body>
+</html>
