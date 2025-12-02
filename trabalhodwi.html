@@ -1,153 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Controle de Tarefas</title>
+    <meta charset="UTF-8">
+    <title>Caderno de Anotações</title>
+    <link rel="stylesheet" href="inserir.css">
 </head>
-
 <body>
 
-<h1>Sistema de Controle de Tarefas</h1>
+<div class="container">
 
-<!-- LISTA -->
-<div id="listaTela">
-    <h2>Lista de Tarefas</h2>
+    <h1>Caderno de Anotações</h1>
 
-    <button id="btnNovaTarefa">Nova Tarefa</button>
+    <div id="listaTela">
+        <button onclick="abrirCadastro()">Nova Tarefa</button>
+        <button onclick="carregar()">Atualizar</button>
+        <div id="lista"></div>
+    </div>
 
-    <table border="1" width="100%">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Prioridade</th>
-                <th>Descrição</th>
-                <th>Local</th>
-                <th>Recursos</th>
-                <th>Data Limite</th>
-                <th>Matrícula</th>
-            </tr>
-        </thead>
-        <tbody id="listaCorpo"></tbody>
-    </table>
-</div>
+    <div id="cadastroTela" class="hidden">
+        <h2>Nova Tarefa</h2>
+        <label>Prioridade</label>
+        <select id="prioridade">
+            <option>Baixa</option>
+            <option>Normal</option>
+            <option>Urgente</option>
+        </select>
 
-<!-- CADASTRO -->
-<div id="cadastroTela" style="display:none;">
+        <label>Descrição</label>
+        <textarea id="descricao"></textarea>
 
-    <h2>Cadastrar Nova Tarefa</h2>
+        <label>Local</label>
+        <input type="text" id="local">
 
-    <label>Prioridade</label>
-    <select id="prioridade">
-        <option value="">Selecione</option>
-        <option>Baixa</option>
-        <option>Normal</option>
-        <option>Urgente</option>
-    </select>
+        <label>Recursos Necessários</label>
+        <textarea id="recursos"></textarea>
 
-    <label>Descrição</label>
-    <input id="descricao" type="text">
+        <label>Data Limite</label>
+        <input type="datetime-local" id="dataLimite">
 
-    <label>Local</label>
-    <input id="local" type="text">
+        <label>Matrícula</label>
+        <input type="number" id="matricula">
 
-    <label>Recursos Necessários (um por linha)</label>
-    <textarea id="recursos"></textarea>
+        <button onclick="salvar()">Salvar</button>
+        <button class="cancelar" onclick="abrirLista()">Cancelar</button>
+    </div>
 
-    <label>Data Limite</label>
-    <input id="dataLimite" type="datetime-local">
-
-    <label>Matrícula</label>
-    <input id="matricula" type="number">
-
-    <button id="btnSalvar">Salvar</button>
-    <button id="btnCancelar">Cancelar</button>
 </div>
 
 <script>
-// Abrir lista
 function abrirLista() {
-    document.getElementById("listaTela").style.display = "block";
-    document.getElementById("cadastroTela").style.display = "none";
+    document.getElementById("listaTela").classList.remove("hidden");
+    document.getElementById("cadastroTela").classList.add("hidden");
     carregar();
 }
 
-// Abrir cadastro
 function abrirCadastro() {
-    document.getElementById("listaTela").style.display = "none";
-    document.getElementById("cadastroTela").style.display = "block";
-    document.getElementById("prioridade").value = "";
-    document.getElementById("descricao").value = "";
-    document.getElementById("local").value = "";
-    document.getElementById("recursos").value = "";
-    document.getElementById("dataLimite").value = "";
-    document.getElementById("matricula").value = "";
+    document.getElementById("listaTela").classList.add("hidden");
+    document.getElementById("cadastroTela").classList.remove("hidden");
 }
 
-// Carregar lista
 function carregar() {
-    let dados = JSON.parse(localStorage.getItem("tarefas")) || [];
-    let corpo = document.getElementById("listaCorpo");
-    corpo.innerHTML = "";
+    const dados = JSON.parse(localStorage.getItem("tarefas")) || [];
+    const area = document.getElementById("lista");
 
-    for (let i = 0; i < dados.length; i++) {
-        let t = dados[i];
-
-        // Urgente em vermelho
-        let cor = t.prioridade === "Urgente" ? " style='color:red; font-weight:bold;'" : "";
-
-        let linha = "<tr" + cor + ">";
-        linha += "<td>" + (i+1) + "</td>";
-        linha += "<td>" + t.prioridade + "</td>";
-        linha += "<td>" + t.descricao + "</td>";
-        linha += "<td>" + t.local + "</td>";
-        linha += "<td>" + t.recursosNecessarios.join(", ") + "</td>";
-        linha += "<td>" + t.dataLimite + "</td>";
-        linha += "<td>" + t.matricula + "</td>";
-        linha += "</tr>";
-
-        corpo.innerHTML += linha;
-    }
-}
-
-// Salvar tarefa
-function salvar() {
-    let prioridade = document.getElementById("prioridade").value;
-    let descricao = document.getElementById("descricao").value;
-    let local = document.getElementById("local").value;
-    let recursos = document.getElementById("recursos").value;
-    let dataLimite = document.getElementById("dataLimite").value;
-    let matricula = document.getElementById("matricula").value;
-
-    if (!prioridade || !descricao || !local || !dataLimite || !matricula) {
-        alert("Preencha todos os campos obrigatórios.");
+    if (dados.length === 0) {
+        area.innerHTML = "<p class='small'>Nenhuma tarefa cadastrada.</p>";
         return;
     }
 
-    let listaRecursos = recursos.split("\n");
+    let tabela = "<table>";
+    tabela += "<tr><th>ID</th><th>Prioridade</th><th>Descrição</th><th>Local</th><th>Recursos</th><th>Data Limite</th><th>Matrícula</th></tr>";
 
-    let novaTarefa = {
-        prioridade: prioridade,
-        descricao: descricao,
-        local: local,
-        recursosNecessarios: listaRecursos,
-        dataLimite: dataLimite,
-        matricula: matricula
-    };
+    for (let i = 0; i < dados.length; i++) {
+        const t = dados[i];
+        const classeUrgente = t.prioridade === "Urgente" ? "urgente" : "";
+        tabela += `<tr class="${classeUrgente}">
+            <td>${i+1}</td>
+            <td>${t.prioridade}</td>
+            <td>${t.descricao}</td>
+            <td>${t.local}</td>
+            <td>${t.recursos}</td>
+            <td>${t.dataLimite}</td>
+            <td>${t.matricula}</td>
+        </tr>`;
+    }
 
-    let lista = JSON.parse(localStorage.getItem("tarefas")) || [];
-    lista.push(novaTarefa);
-    localStorage.setItem("tarefas", JSON.stringify(lista));
-
-    abrirLista(); // volta e atualiza automaticamente
+    tabela += "</table>";
+    area.innerHTML = tabela;
 }
 
-// Eventos
-document.getElementById("btnNovaTarefa").onclick = abrirCadastro;
-document.getElementById("btnCancelar").onclick = abrirLista;
-document.getElementById("btnSalvar").onclick = salvar;
+function salvar() {
+    const prioridade = document.getElementById("prioridade").value;
+    const descricao = document.getElementById("descricao").value.trim();
+    const local = document.getElementById("local").value.trim();
+    const recursos = document.getElementById("recursos").value.trim();
+    const dataLimite = document.getElementById("dataLimite").value;
+    const matricula = document.getElementById("matricula").value.trim();
 
-// Inicializa
-abrirLista();
+    if (!descricao || !local || !dataLimite || !matricula) {
+        alert("Por favor, preencha todos os campos obrigatórios.");
+        return;
+    }
+
+    const tarefa = { prioridade, descricao, local, recursos, dataLimite, matricula };
+
+    const lista = JSON.parse(localStorage.getItem("tarefas")) || [];
+    lista.push(tarefa);
+    localStorage.setItem("tarefas", JSON.stringify(lista));
+
+    abrirLista();
+}
 </script>
 
 </body>
