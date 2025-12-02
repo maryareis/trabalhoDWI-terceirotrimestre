@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #fce4ec, #e0f7fa);
+    background: linear-gradient(135deg, #ffe6f0, #ffd6e8);
     margin: 0;
     padding: 40px;
 }
@@ -8,14 +8,14 @@ body {
 .container {
     max-width: 900px;
     margin: auto;
-    background-color: white;
+    background-color: #fff0f6;
     padding: 30px;
     border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(255, 102, 178, 0.2);
 }
 
 h1, h2 {
-    color: #333;
+    color: #d4005f;
     margin-bottom: 25px;
     border-left: 6px solid #ff80ab;
     padding-left: 12px;
@@ -26,14 +26,16 @@ label {
     font-weight: bold;
     margin-top: 14px;
     margin-bottom: 6px;
+    color: #b3004c;
 }
 
 input, select, textarea {
     width: 100%;
     padding: 12px;
     margin-bottom: 12px;
-    border: 1px solid #ccc;
+    border: 1px solid #ff80ab;
     border-radius: 10px;
+    background-color: #fff0f6;
 }
 
 textarea {
@@ -48,6 +50,7 @@ button {
     border: none;
     border-radius: 10px;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
 button:hover {
@@ -55,17 +58,21 @@ button:hover {
 }
 
 button.cancelar {
-    background-color: #ccc;
+    background-color: #ffb6c1;
+    color: #800040;
 }
 
 button.cancelar:hover {
-    background-color: #aaa;
+    background-color: #ffa0b3;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(255, 102, 178, 0.2);
 }
 
 th {
@@ -76,7 +83,7 @@ th {
 
 td {
     padding: 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #ffd6e8;
 }
 
 tr:hover td {
@@ -84,9 +91,11 @@ tr:hover td {
 }
 
 .urgente {
-    color: red;
+    color: #d40000;
     font-weight: bold;
-    background-color: #ffd6d6;
+    background-color: #ffcccc;
+    border-radius: 6px;
+    padding: 2px 6px;
 }
 
 .hidden {
@@ -95,5 +104,5 @@ tr:hover td {
 
 .small {
     font-size: 0.9em;
-    color: #555;
+    color: #b3004c;
 }
